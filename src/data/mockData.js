@@ -21,7 +21,7 @@ export const agents = [
     confidenceScore: "High",
     inputs: ["User query"],
     outputs: ["3 sub-tasks"],
-    position: { x: 50, y: 200 },
+    position: { x: 20, y: 200 },
     logs: [
       "2024-01-15 10:23:45 | Received query: quantum computing developments",
       "2024-01-15 10:23:45 | Analyzing query complexity...",
@@ -39,7 +39,7 @@ export const agents = [
     confidenceScore: "Low",
     inputs: ["Query from Planner Agent"],
     outputs: ["12 documents"],
-    position: { x: 250, y: 200 },
+    position: { x: 180, y: 200 },
     logs: [
       "2024-01-15 10:23:46 | Received task: research quantum computing developments",
       "2024-01-15 10:23:47 | Querying knowledge base...",
@@ -62,7 +62,7 @@ export const agents = [
     confidenceScore: "High",
     inputs: ["Document IDs from Research Agent"],
     outputs: ["Full text content"],
-    position: { x: 450, y: 200 },
+    position: { x: 340, y: 200 },
     logs: [
       "2024-01-15 10:23:51 | Received 12 document IDs",
       "2024-01-15 10:23:52 | Fetching content from sources...",
@@ -80,7 +80,7 @@ export const agents = [
     confidenceScore: "Medium",
     inputs: ["Content from Retrieval Agent"],
     outputs: ["Synthesized response"],
-    position: { x: 650, y: 200 },
+    position: { x: 500, y: 200 },
     logs: [
       "2024-01-15 10:23:53 | Waiting for content...",
       "2024-01-15 10:23:53 | Received content from Retrieval Agent",
@@ -99,7 +99,7 @@ export const agents = [
     confidenceScore: "Medium",
     inputs: ["Response from Synthesis Agent"],
     outputs: ["Validated response"],
-    position: { x: 850, y: 200 },
+    position: { x: 660, y: 200 },
     logs: [
       "2024-01-15 10:23:55 | Received synthesized response",
       "2024-01-15 10:23:55 | Validating accuracy and completeness...",
