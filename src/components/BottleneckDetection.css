@@ -1,0 +1,126 @@
+.bottleneck-detection {
+  background-color: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-left: 3px solid #fbbf24;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.bottleneck-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  color: #fbbf24;
+}
+
+.bottleneck-icon {
+  font-size: 1.125rem;
+}
+
+.bottleneck-message {
+  flex: 1;
+  color: #e5e5e5;
+}
+
+.bottleneck-message strong {
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.bottleneck-comparison {
+  margin-bottom: 1.25rem;
+}
+
+.comparison-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #a1a1aa;
+  margin-bottom: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.comparison-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.comparison-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.comparison-agent-name {
+  font-size: 0.75rem;
+  color: #a1a1aa;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bottleneck-tag {
+  background-color: #fbbf24;
+  color: #18181b;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.comparison-bar-container {
+  height: 28px;
+  background-color: #27272a;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.comparison-bar {
+  height: 100%;
+  background-color: #3f3f46;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  transition: width 0.3s ease;
+  min-width: 60px;
+}
+
+.comparison-bar.bottleneck-bar {
+  background-color: #fbbf24;
+}
+
+.bar-value {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #fafafa;
+  white-space: nowrap;
+}
+
+.comparison-bar.bottleneck-bar .bar-value {
+  color: #18181b;
+}
+
+.bottleneck-suggestion {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(251, 191, 36, 0.2);
+  font-size: 0.75rem;
+  color: #a1a1aa;
+}
+
+.suggestion-label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #e5e5e5;
+}
+
+.suggestion-text {
+  color: #fbbf24;
+  font-style: italic;
+}

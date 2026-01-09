@@ -1,0 +1,127 @@
+.agent-detail-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #27272a;
+}
+
+.panel-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fafafa;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.panel-section.warning {
+  background-color: rgba(251, 191, 36, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #fbbf24;
+}
+
+.section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section-value {
+  font-size: 0.875rem;
+  color: #e5e5e5;
+  line-height: 1.6;
+}
+
+.section-value.highlight {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.section-note {
+  font-size: 0.75rem;
+  color: #fbbf24;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.confidence-badge {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.flagged-indicator {
+  font-size: 0.75rem;
+  color: #f87171;
+  margin-left: 0.5rem;
+}
+
+.value-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.value-list li {
+  padding: 0.375rem 0;
+  padding-left: 1.25rem;
+  position: relative;
+  color: #a1a1aa;
+}
+
+.value-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #52525b;
+}
+
+.logs-container {
+  background-color: #0f0f10;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+}
+
+.log-entry {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+
+.log-entry:last-child {
+  margin-bottom: 0;
+}
+
+.log-entry code {
+  color: #a1a1aa;
+  background: transparent;
+  padding: 0;
+}

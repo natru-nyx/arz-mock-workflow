@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arzule - Multi-Agent Observability</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background-color: #fafafa;
+            color: #1a1a1a;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .tagline {
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .app-main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .workflow-container {
+            background-color: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .workflow-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background-color: #f5f5f5;
+            padding: 0.25rem;
+            border-radius: 6px;
+        }
+
+        .view-toggle button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .view-toggle button:hover {
+            background-color: #e5e5e5;
+        }
+
+        .view-toggle button.active {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .bottleneck-detection {
+            background-color: #fef9c3;
+            border: 1px solid #eab308;
+            border-left: 4px solid #eab308;
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .bottleneck-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: #854d0e;
+        }
+
+        .bottleneck-icon {
+            font-size: 1.25rem;
+        }
+
+        .bottleneck-message strong {
+            font-weight: 600;
+        }
+
+        .comparison-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #854d0e;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .comparison-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .comparison-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .comparison-agent-name {
+            font-size: 0.75rem;
+            color: #854d0e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bottleneck-tag {
+            background-color: #eab308;
+            color: #1a1a1a;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .comparison-bar-container {
+            height: 24px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .comparison-bar {
+            height: 100%;
+            background-color: #e5e5e5;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            transition: width 0.3s;
+            min-width: 60px;
+        }
+
+        .comparison-bar.bottleneck-bar {
+            background-color: #eab308;
+        }
+
+        .bar-value {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            white-space: nowrap;
+        }
+
+        .workflow-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .workflow-left {
+            min-height: 500px;
+        }
+
+        .workflow-right {
+            border-left: 1px solid #e5e5e5;
+            padding-left: 2rem;
+        }
+
+        .timeline-container {
+            position: relative;
+            min-height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-svg {
+            width: 100%;
+            height: 300px;
+            overflow: visible;
+        }
+
+        .agent-labels {
+            position: relative;
+            margin-top: 1rem;
+            height: 80px;
+        }
+
+        .agent-label {
+            position: absolute;
+            width: 120px;
+            padding: 0.5rem;
+            background-color: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .agent-label:hover {
+            border-color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .agent-label.selected {
+            border-color: #1a1a1a;
+            border-width: 2px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .agent-label-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-label-time {
+            font-size: 0.875rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .agent-label-retries {
+            font-size: 0.7rem;
+            color: #eab308;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        .timeline-legend {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem;
+            background-color: #fafafa;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #e5e5e5;
+        }
+
+        .empty-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 0.875rem;
+        }
+
+        .agent-detail-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .panel-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .panel-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .panel-section.warning {
+            background-color: #fef9c3;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border-left: 3px solid #eab308;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-value {
+            font-size: 0.875rem;
+            color: #1a1a1a;
+            line-height: 1.5;
+        }
+
+        .section-value.highlight {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .section-note {
+            font-size: 0.75rem;
+            color: #854d0e;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .value-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .value-list li {
+            padding: 0.25rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .value-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #999;
+        }
+
+        .logs-container {
+            background-color: #1a1a1a;
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .log-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .log-entry code {
+            color: #e5e5e5;
+            background: transparent;
+            padding: 0;
+        }
+
+        .summary-trigger {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+        }
+
+        .summary-trigger button {
+            padding: 0.75rem 1.5rem;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .summary-trigger button:hover {
+            background-color: #333;
+        }
+
+        .outcome-summary-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .outcome-summary {
+            background-color: #ffffff;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .summary-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .close-button:hover {
+            background-color: #f5f5f5;
+            color: #1a1a1a;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-ctas {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 0 2rem 2rem 2rem;
+        }
+
+        .cta-primary {
+            display: block;
+            padding: 1rem 1.5rem;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .cta-primary:hover {
+            background-color: #333;
+        }
+
+        .cta-secondary {
+            display: block;
+            padding: 1rem 1.5rem;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .cta-secondary:hover {
+            border-color: #1a1a1a;
+            background-color: #fafafa;
+        }
+
+        .summary-footer {
+            padding: 0 2rem 2rem 2rem;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 2rem;
+        }
+
+        .summary-footer p {
+            font-size: 0.875rem;
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="logo">Arzule</h1>
+                <p class="tagline">Observability for multi-agent systems</p>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="workflow-container">
+                <div class="workflow-header">
+                    <h2>Multi-Agent Workflow: Research Task</h2>
+                    <div class="view-toggle">
+                        <button class="active" onclick="setViewMode('timeline')">Timeline</button>
+                        <button onclick="setViewMode('trace')">Trace</button>
+                    </div>
+                </div>
+
+                <div class="bottleneck-detection">
+                    <div class="bottleneck-header">
+                        <span class="bottleneck-icon">⚠</span>
+                        <span class="bottleneck-message">
+                            Bottleneck detected: <strong>Research Agent</strong> caused 63% of total workflow latency.
+                        </span>
+                    </div>
+                    <div class="bottleneck-comparison">
+                        <div class="comparison-label">Agent Latencies</div>
+                        <div class="comparison-bars">
+                            <div class="comparison-item">
+                                <div class="comparison-agent-name">Planner Agent</div>
+                                <div class="comparison-bar-container">
+                                    <div class="comparison-bar" style="width: 25%">
+                                        <span class="bar-value">1.2s</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <div class="comparison-agent-name">Research Agent <span class="bottleneck-tag">Bottleneck</span></div>
+                                <div class="comparison-bar-container">
+                                    <div class="comparison-bar bottleneck-bar" style="width: 100%">
+                                        <span class="bar-value">4.8s</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <div class="comparison-agent-name">Retrieval Agent</div>
+                                <div class="comparison-bar-container">
+                                    <div class="comparison-bar" style="width: 37.5%">
+                                        <span class="bar-value">1.8s</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <div class="comparison-agent-name">Synthesis Agent</div>
+                                <div class="comparison-bar-container">
+                                    <div class="comparison-bar" style="width: 31.25%">
+                                        <span class="bar-value">1.5s</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <div class="comparison-agent-name">Validator Agent</div>
+                                <div class="comparison-bar-container">
+                                    <div class="comparison-bar" style="width: 6.25%">
+                                        <span class="bar-value">0.3s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottleneck-suggestion">
+                        <div class="suggestion-label">Common causes:</div>
+                        <div class="suggestion-text">insufficient context, prompt ambiguity, retrieval depth</div>
+                    </div>
+                </div>
+
+                <div class="workflow-content">
+                    <div class="workflow-left">
+                        <div id="timeline-view">
+                            <div class="timeline-container">
+                                <svg width="100%" height="300" viewBox="0 0 900 300" preserveAspectRatio="xMidYMid meet" class="timeline-svg">
+                                    <defs>
+                                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                            <polygon points="0 0, 10 3, 0 6" fill="#6b7280" />
+                                        </marker>
+                                    </defs>
+                                    <path d="M 130 200 L 250 200" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#arrowhead)" opacity="0.4" />
+                                    <path d="M 330 200 L 450 200" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#arrowhead)" opacity="0.4" />
+                                    <path d="M 530 200 L 650 200" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#arrowhead)" opacity="0.4" />
+                                    <path d="M 730 200 L 850 200" stroke="#6b7280" stroke-width="2" fill="none" marker-end="url(#arrowhead)" opacity="0.4" />
+                                    <g>
+                                        <circle cx="90" cy="200" r="35" fill="#22c55e" stroke="#ffffff" stroke-width="2" class="agent-node" onclick="selectAgent('planner')" style="cursor: pointer" />
+                                        <text x="90" y="205" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600" pointer-events="none">Planner</text>
+                                    </g>
+                                    <g>
+                                        <circle cx="290" cy="200" r="35" fill="#eab308" stroke="#ffffff" stroke-width="2" class="agent-node" onclick="selectAgent('research')" style="cursor: pointer" opacity="0.8" />
+                                        <text x="290" y="205" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600" pointer-events="none">Research</text>
+                                    </g>
+                                    <g>
+                                        <circle cx="490" cy="200" r="35" fill="#22c55e" stroke="#ffffff" stroke-width="2" class="agent-node" onclick="selectAgent('retrieval')" style="cursor: pointer" />
+                                        <text x="490" y="205" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600" pointer-events="none">Retrieval</text>
+                                    </g>
+                                    <g>
+                                        <circle cx="690" cy="200" r="35" fill="#22c55e" stroke="#ffffff" stroke-width="2" class="agent-node" onclick="selectAgent('synthesis')" style="cursor: pointer" />
+                                        <text x="690" y="205" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600" pointer-events="none">Synthesis</text>
+                                    </g>
+                                    <g>
+                                        <circle cx="890" cy="200" r="35" fill="#f59e0b" stroke="#ffffff" stroke-width="2" class="agent-node" onclick="selectAgent('validator')" style="cursor: pointer" />
+                                        <text x="890" y="205" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600" pointer-events="none">Validator</text>
+                                    </g>
+                                </svg>
+                                <div class="agent-labels">
+                                    <div class="agent-label" id="label-planner" onclick="selectAgent('planner')" style="left: 50px;">
+                                        <div class="agent-label-name">Planner Agent</div>
+                                        <div class="agent-label-time">1.2s</div>
+                                    </div>
+                                    <div class="agent-label" id="label-research" onclick="selectAgent('research')" style="left: 250px;">
+                                        <div class="agent-label-name">Research Agent</div>
+                                        <div class="agent-label-time">4.8s</div>
+                                        <div class="agent-label-retries">2 retries</div>
+                                    </div>
+                                    <div class="agent-label" id="label-retrieval" onclick="selectAgent('retrieval')" style="left: 450px;">
+                                        <div class="agent-label-name">Retrieval Agent</div>
+                                        <div class="agent-label-time">1.8s</div>
+                                    </div>
+                                    <div class="agent-label" id="label-synthesis" onclick="selectAgent('synthesis')" style="left: 650px;">
+                                        <div class="agent-label-name">Synthesis Agent</div>
+                                        <div class="agent-label-time">1.5s</div>
+                                    </div>
+                                    <div class="agent-label" id="label-validator" onclick="selectAgent('validator')" style="left: 850px;">
+                                        <div class="agent-label-name">Critic / Validator Agent</div>
+                                        <div class="agent-label-time">0.3s</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #22c55e;"></div>
+                                    <span>Success</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #eab308;"></div>
+                                    <span>Retry / Delay</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #f59e0b;"></div>
+                                    <span>Warning</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #ef4444;"></div>
+                                    <span>Failure</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="trace-view" class="hidden">
+                            <div style="padding: 1rem;">
+                                <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0 0 0.5rem 0;">End-to-End Trace</h3>
+                                <p style="font-size: 0.875rem; color: #666; margin: 0 0 2rem 0;">Sequential view of workflow events and agent interactions</p>
+                                <div style="position: relative; padding-left: 2rem;">
+                                    <div style="position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background-color: #e5e5e5;"></div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">0.0s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">User</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Query submitted</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">What are the latest developments in quantum computing and their potential applications in cryptography?</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">0.1s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Planner Agent</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Task breakdown</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">Generated 3 sub-tasks</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">1.3s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Research Agent</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Initial retrieval</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">5 documents found</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">2.5s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Research Agent</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Retry #1</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">Expanded search parameters</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">3.7s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Research Agent</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Retry #2</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">Added context, 12 documents retrieved</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">6.1s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Retrieval Agent</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Content fetched</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">Full text retrieved</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">7.9s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Synthesis Agent</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Response synthesized</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">Coherent response generated</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative; margin-bottom: 1.5rem;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">9.4s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">Validator Agent</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Validation complete</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">Medium confidence, approved</div>
+                                        </div>
+                                    </div>
+                                    <div style="position: relative;">
+                                        <div style="position: absolute; left: -2rem; top: 0; font-size: 0.75rem; color: #999; width: 3rem; text-align: right; padding-right: 0.75rem;">9.6s</div>
+                                        <div style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 6px; padding: 1rem; margin-left: 1rem;">
+                                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">System</div>
+                                            <div style="font-size: 0.875rem; color: #666; margin-bottom: 0.5rem;">Workflow complete</div>
+                                            <div style="font-size: 0.75rem; color: #999; font-style: italic;">Response delivered to user</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e5e5e5;">
+                                    <div style="font-size: 0.75rem; color: #666; line-height: 1.6;">
+                                        <strong style="color: #1a1a1a;">Note:</strong> This is observability data. Arzule does not control agent execution.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-right">
+                        <div id="agent-detail-panel">
+                            <div class="empty-panel">
+                                <p>Select an agent to view details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-trigger">
+                    <button onclick="showSummary()">View Workflow Summary</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="summary-overlay" class="hidden">
+        <div class="outcome-summary-overlay" onclick="hideSummary()">
+            <div class="outcome-summary" onclick="event.stopPropagation()">
+                <div class="summary-header">
+                    <h2>Workflow Summary</h2>
+                    <button class="close-button" onclick="hideSummary()">×</button>
+                </div>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Agents</div>
+                        <div class="stat-value">5</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Total Time</div>
+                        <div class="stat-value">9.6s</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Bottlenecks Detected</div>
+                        <div class="stat-value">1</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Failed Handoffs</div>
+                        <div class="stat-value">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Confidence Risk</div>
+                        <div class="stat-value" style="color: #eab308;">Medium</div>
+                    </div>
+                </div>
+                <div class="summary-ctas">
+                    <a href="#" class="cta-primary" onclick="event.preventDefault(); alert('Integration guide would open here'); return false;">See how this works with your agents</a>
+                    <a href="#" class="cta-secondary" onclick="event.preventDefault(); alert('Schedule call dialog would open here'); return false;">Schedule a call</a>
+                </div>
+                <div class="summary-footer">
+                    <p>Arzule provides observability for multi-agent systems built with LangGraph, CrewAI, AutoGen, and other frameworks.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const agentData = {
+            planner: {
+                name: "Planner Agent",
+                role: "Breaks down complex queries into sub-tasks",
+                latency: "1.2",
+                status: "success",
+                retries: 0,
+                confidenceScore: "High",
+                inputs: ["User query"],
+                outputs: ["3 sub-tasks"],
+                logs: [
+                    "2024-01-15 10:23:45 | Received query: quantum computing developments",
+                    "2024-01-15 10:23:45 | Analyzing query complexity...",
+                    "2024-01-15 10:23:46 | Generated 3 sub-tasks: [quantum advances, crypto applications, recent papers]",
+                    "2024-01-15 10:23:46 | Handing off to Research Agent"
+                ]
+            },
+            research: {
+                name: "Research Agent",
+                role: "Retrieves relevant documents",
+                latency: "4.8",
+                status: "retry",
+                retries: 2,
+                confidenceScore: "Low",
+                inputs: ["Query from Planner Agent"],
+                outputs: ["12 documents"],
+                logs: [
+                    "2024-01-15 10:23:46 | Received task: research quantum computing developments",
+                    "2024-01-15 10:23:47 | Querying knowledge base...",
+                    "2024-01-15 10:23:48 | Initial retrieval returned 5 documents (insufficient)",
+                    "2024-01-15 10:23:49 | Retry #1: Expanded search parameters",
+                    "2024-01-15 10:23:50 | Retry #2: Added context from recent papers",
+                    "2024-01-15 10:23:51 | Retrieved 12 documents (sufficient coverage)",
+                    "2024-01-15 10:23:51 | Response required retries due to missing context"
+                ]
+            },
+            retrieval: {
+                name: "Retrieval Agent",
+                role: "Fetches detailed content from sources",
+                latency: "1.8",
+                status: "success",
+                retries: 0,
+                confidenceScore: "High",
+                inputs: ["Document IDs from Research Agent"],
+                outputs: ["Full text content"],
+                logs: [
+                    "2024-01-15 10:23:51 | Received 12 document IDs",
+                    "2024-01-15 10:23:52 | Fetching content from sources...",
+                    "2024-01-15 10:23:53 | Retrieved full text for all documents",
+                    "2024-01-15 10:23:53 | Handing off to Synthesis Agent"
+                ]
+            },
+            synthesis: {
+                name: "Synthesis Agent",
+                role: "Combines information into coherent response",
+                latency: "1.5",
+                status: "success",
+                retries: 0,
+                confidenceScore: "Medium",
+                inputs: ["Content from Retrieval Agent"],
+                outputs: ["Synthesized response"],
+                logs: [
+                    "2024-01-15 10:23:53 | Waiting for content...",
+                    "2024-01-15 10:23:53 | Received content from Retrieval Agent",
+                    "2024-01-15 10:23:54 | Synthesizing information...",
+                    "2024-01-15 10:23:55 | Generated coherent response",
+                    "2024-01-15 10:23:55 | Handing off to Validator Agent"
+                ]
+            },
+            validator: {
+                name: "Critic / Validator Agent",
+                role: "Validates response quality and accuracy",
+                latency: "0.3",
+                status: "warning",
+                retries: 0,
+                confidenceScore: "Medium",
+                inputs: ["Response from Synthesis Agent"],
+                outputs: ["Validated response"],
+                logs: [
+                    "2024-01-15 10:23:55 | Received synthesized response",
+                    "2024-01-15 10:23:55 | Validating accuracy and completeness...",
+                    "2024-01-15 10:23:55 | Flagged low confidence: some claims need verification",
+                    "2024-01-15 10:23:55 | Response approved with medium confidence"
+                ]
+            }
+        };
+
+        function selectAgent(agentId) {
+            const agent = agentData[agentId];
+            if (!agent) return;
+
+            // Update labels
+            document.querySelectorAll('.agent-label').forEach(el => el.classList.remove('selected'));
+            document.getElementById('label-' + agentId)?.classList.add('selected');
+
+            // Update panel
+            const panel = document.getElementById('agent-detail-panel');
+            const statusColors = {
+                success: { bg: '#dcfce7', text: '#166534' },
+                retry: { bg: '#fef9c3', text: '#854d0e' },
+                warning: { bg: '#fef3c7', text: '#92400e' },
+                failure: { bg: '#fee2e2', text: '#991b1b' }
+            };
+            const statusColor = statusColors[agent.status] || statusColors.success;
+            const confidenceColors = {
+                High: '#22c55e',
+                Medium: '#eab308',
+                Low: '#ef4444'
+            };
+
+            panel.innerHTML = `
+                <div class="agent-detail-panel">
+                    <div class="panel-header">
+                        <h3>${agent.name}</h3>
+                        <span class="status-badge" style="background-color: ${statusColor.bg}; color: ${statusColor.text}">
+                            ${agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}
+                        </span>
+                    </div>
+                    <div class="panel-section">
+                        <div class="section-label">Role</div>
+                        <div class="section-value">${agent.role}</div>
+                    </div>
+                    <div class="panel-section">
+                        <div class="section-label">Latency</div>
+                        <div class="section-value highlight">${agent.latency}s</div>
+                    </div>
+                    ${agent.retries > 0 ? `
+                    <div class="panel-section warning">
+                        <div class="section-label">Retries</div>
+                        <div class="section-value">${agent.retries}</div>
+                        <div class="section-note">Response required retries due to missing context</div>
+                    </div>
+                    ` : ''}
+                    <div class="panel-section">
+                        <div class="section-label">Confidence Score</div>
+                        <div class="section-value">
+                            <span class="confidence-badge" style="color: ${confidenceColors[agent.confidenceScore]}">
+                                ${agent.confidenceScore}
+                            </span>
+                            ${agent.confidenceScore === 'Low' ? '<span class="flagged-indicator"> (flagged)</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="panel-section">
+                        <div class="section-label">Inputs</div>
+                        <div class="section-value">
+                            <ul class="value-list">
+                                ${agent.inputs.map(i => `<li>${i}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-section">
+                        <div class="section-label">Outputs</div>
+                        <div class="section-value">
+                            <ul class="value-list">
+                                ${agent.outputs.map(o => `<li>${o}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-section">
+                        <div class="section-label">Logs</div>
+                        <div class="logs-container">
+                            ${agent.logs.map(log => `<div class="log-entry"><code>${log}</code></div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setViewMode(mode) {
+            document.querySelectorAll('.view-toggle button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (mode === 'timeline') {
+                document.getElementById('timeline-view').classList.remove('hidden');
+                document.getElementById('trace-view').classList.add('hidden');
+            } else {
+                document.getElementById('timeline-view').classList.add('hidden');
+                document.getElementById('trace-view').classList.remove('hidden');
+            }
+        }
+
+        function showSummary() {
+            document.getElementById('summary-overlay').classList.remove('hidden');
+        }
+
+        function hideSummary() {
+            document.getElementById('summary-overlay').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
